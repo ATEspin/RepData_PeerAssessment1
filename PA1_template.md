@@ -1,17 +1,12 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output:
-  html_document:
-    keep_md: yes
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 The following code unzips the activity.zip file into the working directory and load
 the content (i.e. activity.csv file) into a dataframe in R. A new dataframe is created
 with the date variable coursed to Date class.
-```{r, echo = TRUE, warning=FALSE, message=FALSE}
 
+```r
 library(dplyr)
 library(ggplot2)
 options(scipen = 999)
@@ -25,7 +20,8 @@ p_activity$date<-as.Date(p_activity$date)
 ## What is mean total number of steps taken per day?
 Code to generate a summarised dataframe with the total number of steps per day, an
 histogram and the statistic mean and median of the total number of steps.
-```{r, echo = TRUE, warning=FALSE, message=FALSE}
+
+```r
 Total_activity<-group_by(p_activity, date)
 Total_activity<-summarise(Total_activity, Total_steps=sum(steps))
 
@@ -40,15 +36,14 @@ median_total_steps<-median(Total_activity$Total_steps, na.rm=T)
 ```
 An histogram shows the frequency of the total step number using a bin of 3000 steps.
 
-```{r,echo = FALSE, warning=FALSE, fig.height=4}
-print(plot1)
-```
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
-Total number of steps: mean=`r mean_total_steps`; median=`r median_total_steps`
+Total number of steps: mean=10766.1886792; median=10765
 
 ## What is the average daily activity pattern?
 The following code generates a time series plot of the average of steps taken across days
-```{r,echo = TRUE, warning=FALSE, message=FALSE}
+
+```r
 average_activity<-group_by(p_activity, interval)
 average_activity<-summarise(average_activity, mean_steps=mean(steps, na.rm = T))
 
@@ -62,17 +57,16 @@ max_interval<-average_activity$interval[average_activity$mean_steps==
 ```
 Time series plot:
 
-```{r,echo = FALSE, warning=FALSE, fig.height=4}
-print(plot2)
-```
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
-The interval where the average of steps across days is maximum is `r max_interval`.
+The interval were the average of steps across days is maximum is 835.
 
 ## Imputing missing values
 The following code impute the missing values in the original dataset by the mean
 of the respective interval across days. An histogram is generated using the new 
 dataframe with the interpolated missing values.
-```{r,echo = TRUE, warning=FALSE, message=FALSE}
+
+```r
 NA_values<-sum(is.na(p_activity$steps))
 
 NoNA_activity<-p_activity[is.na(p_activity$steps)==T,c("interval", "date")]
@@ -94,14 +88,12 @@ mean_total_NoNA<-mean(Total_NoNA_activity$Total_steps)
 median_total_NoNA<-median(Total_NoNA_activity$Total_steps)
 ```
 
-```{r,echo = FALSE, warning=FALSE, fig.height=4}
-print(plot3)
-```
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
-The total of missing values in the original data set is `r NA_values`. Interpolating
+The total of missing values in the original data set is 2304. Interpolating
 the missing values by the mean of the respective interval across days doesn't change
-the mean of the total number of steps (mean with NA=`r mean_total_steps` vs. mean 
-NA filled= `r mean_total_NoNA`). However the median changes (median with NA=`r median_total_steps` vs. median NA filled=`r median_total_NoNA`).
+the mean of the total number of steps (mean with NA=10766.1886792 vs. mean 
+NA filled= 10766.1886792). However the median changes (median with NA=10765 vs. median NA filled=10766.1886792).
 
 ## Are there differences in activity patterns between weekdays and weekends?
 The following code generated a new variable call "weekday" that store whether the 
@@ -109,7 +101,8 @@ measured day is a week day or a weekend day. A time series plot with two panels
 (week days and weekends) is generated representig the average of steps by intervals
 across days.
 
-```{r,echo = TRUE, warning=FALSE, message=FALSE,fig.height=4}
+
+```r
 NoNA_activity$dayofweek<-weekdays(NoNA_activity$date)
 NoNA_activity$weekday<-with(NoNA_activity, ifelse(dayofweek%in%c("sábado","domingo"), 
                                                   "weekend", "weekday"))
@@ -120,3 +113,5 @@ ggplot(NoNA_activity, aes(x=interval, y=steps))+
     ggtitle("Avergage steps by interval across days")+
     facet_grid(~weekday)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
